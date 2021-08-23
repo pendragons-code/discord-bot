@@ -1,0 +1,164 @@
+Discord.js v13 was recently released and there are a few things that people may have missed out, a problem for people looking into discord.js development since most vids are from discord.js v12. So I decided to dump some stuff here!
+Basically this is a summary of the most BASIC STUFF since the documentation provided is really good, this is just (re-emphasis) something for those who are new to not only discord.js, but to coding as a whole!
+If you are a pretty experienced veteran, you can ignore this or you can open issues to recommend what other stuff I should add! You were probably once a noob and needed help, maybe it is your turn to help!
+
+
+
+======================================================
+const { Client, Intents } = require('discord.js');
+const myIntents = new Intents(32767);
+
+As some of you may or may not know,the shortcuts Intents.ALL, Intents.NON_PRIVILEGED, and Intents.PRIVILEGED have all been removed to discourage bad practices of enabling unused intents. This means you have to apply for individual ones or use numbers to represent the intents you are using! Basically the number I used here means use all intents!
+Gateway Intents were introduced by Discord so bot developers can choose which events their bot receives based on which data it needs to function.
+To specify which events you want your bot to receive, first think about which events your bot needs to operate. Then select the required intents and add them to your client constructor, as shown below.
+
+full details here: https://discord.com/developers/docs/topics/gateway#privileged-intents
+
+const bot = new Client({ intents: myIntents });
+
+
+
+======================================================
+Embeds are often used to neaten things and fit everything nicely and you will probably use it a lot at a certain point!
+remember to put message or messageCreate (actually whatever you are using, you can name it burger or potato for whatever reason!) in front of .channel.send(unless you defined the channels!)
+v12: channel.send('Hello!', { embed }); (phased out)
+v13: channel.send({ content: 'Hello!', embeds: [embed] }); (latest and greatest)
+
+
+
+======================================================
+messageCreate.reply()
+replies to the request
+
+
+messageCreate.channel.send()
+sends a message to the channel the request came from, without using the reply feature!
+
+
+
+======================================================
+Let's say you wanted to make a command that uses mentions! (Mentions are not removed or changed, but I put it here since people still ask in some forums!)
+
+We will try to replicate the kiss command from a discord bot like owo, using discord.js (Ik many want to make currency and emote bots!)
+
+
+
+const { Client, Intents, MessageEmbed } = require('discord.js');
+const myIntents = new Intents(32767);
+const client = new Client({ intents: myIntents });
+
+
+
+// when the bot is logged in and the messageCreate is defined (it can be renamed to whatever you like, already said this above)
+//rename it by doing client.on('messageCreate', potato => {
+client.on('messageCreate', messageCreate => {
+
+
+  
+  const prefix = "!"
+	if (!messageCreate.content.startsWith(prefix) || messageCreate.author.bot) return;
+  const URL = "GIF_URL_HERE"
+	const args = message.content.slice(prefix.length).trim().split(/ +/);
+	const command = args.shift().toLowerCase();
+/*parts of a message:
+"!" is the prefix
+"kiss" is the command
+"args" refer to arguments!
+
+
+Let's take a look how args work!
+
+"!kiss hello i am a potato"
+
+"!kiss" is the prefix + command
+"hello" is args[0]
+"i" is args[1]
+"am" is args[2]
+"potato" is args[4]
+
+can you guess what is "a"?
+if you guessed args[3], fantastic you are getting a good idea of individual args!
+
+we had to define command since the message came as a whole chunk, we have to tell the bot how to cut it up before we can actually start with detection!
+*/
+
+
+
+function getUserFromMention(mention) {
+	if (!mention) return;
+
+	if (mention.startsWith('<@') && mention.endsWith('>')) {
+		mention = mention.slice(2, -1);
+
+		if (mention.startsWith('!')) {
+			mention = mention.slice(1);
+		}
+
+		return bot.users.cache.get(mention);
+	}
+}
+const user = getUserFromMention(args[0]);
+/*
+This is a function! we first define the function getUserFromMention() you remember args? we are looking for a specific set of variables that tell us which user is being refered!
+To do this, you gotta first define the parts where a mention is made "<@user id here>" is the base format, but the bot will not understand it!
+
+After defining that, we look for what we defined in a specific postion
+
+an analogy: 
+knowing how a specific pencil looks like (the function we defined)
+knowing the location(args[0]) of the said pecil is!
+*/
+
+
+if (!user) {
+return messageCreate.reply(`${prefix} kiss <@user>`);
+			}
+//if the varaible, user (we defined that above already!) is not found it will tell the user to follow the base format and end the task (return)!      
+      
+      
+//if the variable, user is founed, it will proceed to make an embed!      
+if(user){
+//messageCreate.author.username, the username of the person who sent the message
+//user.username, username of the person on the recieving end!
+    let title = `${messageCreate.author.username} kisses ${user.username}!`
+    let footer = `More stuff soon!`
+    let embed = new MessageEmbed();
+    embed.setURL(URL)
+    embed.setTitle(title)
+    embed.setImage(URL)
+    embed.setFooter(footer)
+    embed.setColor("ORANGE")
+    embed.setTimestamp()
+    messageCreate.channel.send({embeds: [embed]})
+}
+});
+
+
+
+//upon the event the bot is logged in, and is ready for operation, a message will appear in your terminal!
+client.on('ready', () => {
+  console.log(`Logged in as ${client.user.tag}!`);
+});
+
+
+
+
+
+client.login("Token_here")
+//NEVER REVEAL YOUR TOKENS!!!! If your token gets revealed, people can use it to log into your bot and do some stuff! To avoid this, try using environment files (.env, remember to use .gitignore if you are posting it to github!).
+//However, if your token really gets compromised, refresh it in the developer's portal!
+
+
+
+======================================================
+
+
+
+
+
+
+
+
+
+
+hope you learnt something new :)
